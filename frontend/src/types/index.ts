@@ -92,6 +92,65 @@ export interface Doctor {
   rating: string;
 }
 
+export interface ClinicalExplanation {
+  title: string;
+  reasoning: string;
+  likelihood_context: string;
+}
+
+export interface AssessmentResponse {
+  main_concern: string;
+  reported_symptoms: string[];
+  duration_timeline?: string;
+  follow_up_summary: Record<string, string>;
+  missing_or_uncertain_info: string[];
+  potential_explanations: ClinicalExplanation[];
+  warning_signs_screened: string[];
+  red_flags_identified: string[];
+  is_escalated: boolean;
+  suggested_next_steps: string[];
+  professional_consultation_recommended: boolean;
+  disclaimer: string;
+}
+
+export interface QuestionDetail {
+  id: string;
+  key: string;
+  text: string;
+  category: string;
+  question_index: number;
+  total_questions: number;
+}
+
+export interface SafetyStatus {
+  is_emergency: boolean;
+  is_ambiguous: boolean;
+  red_flags_detected: string[];
+  action_required?: string;
+  emergency_contact: string;
+}
+
+export type ConversationState =
+  | 'INITIAL'
+  | 'INTAKE'
+  | 'SAFETY_CHECK'
+  | 'FOLLOW_UP'
+  | 'ASSESSMENT'
+  | 'COMPLETED'
+  | 'ESCALATED';
+
+export interface EngineResponse {
+  session_id: string;
+  state: ConversationState;
+  assistant_message: string;
+  next_question?: QuestionDetail | null;
+  safety_status: SafetyStatus;
+  normalized_symptoms: string[];
+  assessment?: AssessmentResponse | null;
+  is_complete: boolean;
+  created_at: string;
+}
+
 export interface DoctorListResponse {
   total: number;
   doctors: Doctor[];

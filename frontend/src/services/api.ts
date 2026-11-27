@@ -1,4 +1,11 @@
-import { HealthStatus, DashboardData, ConsultationDetail, DoctorListResponse } from '../types';
+import {
+  HealthStatus,
+  DashboardData,
+  ConsultationDetail,
+  DoctorListResponse,
+  EngineResponse,
+  AssessmentResponse,
+} from '../types';
 
 const API_BASE = '/api/v1';
 
@@ -34,9 +41,26 @@ export const apiService = {
   getConsultations: () => fetchJson<ConsultationDetail[]>('/consultations'),
 
   startConsultation: (language: string = 'hinglish', chief_complaint?: string) =>
-    fetchJson<ConsultationDetail>('/consultations', {
+    fetchJson<EngineResponse>('/consultations/start', {
       method: 'POST',
       body: JSON.stringify({ language, chief_complaint }),
+    }),
+
+  sendMessage: (sessionId: string, content: string) =>
+    fetchJson<EngineResponse>(`/consultations/${sessionId}/message`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    }),
+
+  getConsultationDetail: (sessionId: string) =>
+    fetchJson<any>(`/consultations/${sessionId}`),
+
+  getAssessment: (sessionId: string) =>
+    fetchJson<AssessmentResponse>(`/consultations/${sessionId}/assessment`),
+
+  completeConsultation: (sessionId: string) =>
+    fetchJson<any>(`/consultations/${sessionId}/complete`, {
+      method: 'POST',
     }),
 
   getDoctors: (params?: { city?: string; specialty?: string; teleconsult_only?: boolean }) => {
