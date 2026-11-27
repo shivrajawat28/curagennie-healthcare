@@ -11,6 +11,7 @@ import {
   X,
   Plus,
   PlayCircle,
+  Printer,
 } from 'lucide-react';
 
 interface HistoryViewProps {
@@ -267,19 +268,30 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="p-4 border-t border-ivory-200 bg-ivory-50 flex items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const id = selectedSession.id;
-                  setSelectedSession(null);
-                  onNavigate('new-consultation', id);
-                }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-forest-800 text-ivory-50 text-xs font-semibold hover:bg-forest-900 transition-colors shadow-soft"
-              >
-                <PlayCircle className="w-3.5 h-3.5" />
-                <span>Resume in Consultation View</span>
-              </button>
+            <div className="p-4 border-t border-ivory-200 bg-ivory-50 flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const id = selectedSession.id;
+                    setSelectedSession(null);
+                    onNavigate('new-consultation', id);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-forest-800 text-ivory-50 text-xs font-semibold hover:bg-forest-900 transition-colors shadow-soft"
+                >
+                  <PlayCircle className="w-3.5 h-3.5" />
+                  <span>Resume in Consultation View</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-ivory-300 bg-white text-forest-900 text-xs font-semibold hover:bg-ivory-100 transition-colors"
+                >
+                  <Printer className="w-3.5 h-3.5 text-forest-800" />
+                  <span>Print Record</span>
+                </button>
+              </div>
 
               <button
                 type="button"

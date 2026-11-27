@@ -11,6 +11,7 @@ import { useVoiceSTT, STTLanguage } from '../../hooks/useVoiceSTT';
 import { useVoiceTTS } from '../../hooks/useVoiceTTS';
 import { useAudioVisualizer } from '../../hooks/useAudioVisualizer';
 import { AudioWaveform } from '../voice/AudioWaveform';
+import { ClinicalSummaryPrintModal } from './ClinicalSummaryPrintModal';
 import {
   Globe,
   Send,
@@ -30,6 +31,8 @@ import {
   Volume2,
   VolumeX,
   Radio,
+  Printer,
+  Info,
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -59,6 +62,7 @@ export const NewConsultationView: React.FC<NewConsultationViewProps> = ({
   const [safetyStatus, setSafetyStatus] = useState<SafetyStatus | null>(null);
   const [assessment, setAssessment] = useState<AssessmentResponse | null>(null);
   const [isComplete, setIsComplete] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // Auto-play voice state
   const [autoVoiceReply, setAutoVoiceReply] = useState<boolean>(true);
@@ -271,6 +275,29 @@ export const NewConsultationView: React.FC<NewConsultationViewProps> = ({
 
         {/* Language selector & reset */}
         <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          {/* Browser Voice Compatibility Badge */}
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-ivory-100 border border-ivory-300 text-[11px] text-charcoal-700 select-none"
+            title={
+              voiceSTT.isSupported
+                ? 'Web Speech API active (Supported in Chrome, Edge, and Brave)'
+                : 'Web Speech API is unsupported in this browser. Universal text mode is active.'
+            }
+          >
+            {voiceSTT.isSupported ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-semibold text-forest-900 hidden sm:inline">Web Speech Ready</span>
+                <span className="font-semibold text-forest-900 sm:hidden">Speech</span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="font-medium text-charcoal-700">Text Mode Fallback</span>
+              </>
+            )}
+          </div>
+
           {/* TTS Audio Toggle */}
           <button
             type="button"
@@ -383,6 +410,21 @@ export const NewConsultationView: React.FC<NewConsultationViewProps> = ({
             <span className="text-[11px] text-red-700/80">
               Proceed to the nearest emergency room immediately.
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* Microphone Permission Blocked Notice */}
+      {voiceSTT.permissionDenied && (
+        <div className="p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-950 text-xs flex items-center justify-between gap-3 shadow-soft">
+          <div className="flex items-center gap-2.5">
+            <Info className="w-5 h-5 text-amber-700 shrink-0" />
+            <div>
+              <p className="font-bold">Microphone access is currently blocked.</p>
+              <p className="text-[11px] text-amber-800 mt-0.5">
+                You can enable microphone permission in your browser URL bar, or continue communicating seamlessly using the text input below.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -703,7 +745,16 @@ export const NewConsultationView: React.FC<NewConsultationViewProps> = ({
               {assessment.disclaimer}
             </p>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setIsPrintModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-sage-300 bg-sage-50 text-forest-900 text-xs font-semibold hover:bg-sage-100 transition-colors shadow-soft"
+              >
+                <Printer className="w-3.5 h-3.5 text-forest-800" />
+                <span>Print / Export Summary</span>
+              </button>
+
               {onNavigate && (
                 <>
                   <button
@@ -727,6 +778,18 @@ export const NewConsultationView: React.FC<NewConsultationViewProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Clinical Summary Printable Modal */}
+      {assessment && (
+        <ClinicalSummaryPrintModal
+          isOpen={isPrintModalOpen}
+          onClose={() => setIsPrintModalOpen(false)}
+          assessment={assessment}
+          sessionId={sessionId}
+          language={selectedLanguage.toUpperCase()}
+          chiefComplaint={assessment.main_concern}
+        />
       )}
     </div>
   );
