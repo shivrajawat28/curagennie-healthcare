@@ -8,10 +8,12 @@ import { DashboardView } from './components/dashboard/DashboardView';
 import { NewConsultationView } from './components/consultation/NewConsultationView';
 import { HistoryView } from './components/history/HistoryView';
 import { DoctorsView } from './components/doctors/DoctorsView';
+import { HospitalsView } from './components/hospitals/HospitalsView';
 import { SettingsView } from './components/settings/SettingsView';
 
 export const App: React.FC = () => {
   const [currentRoute, setCurrentRoute] = useState<NavRoute>('dashboard');
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +23,6 @@ export const App: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      // Check health and retrieve dashboard data concurrently
       const [health, dashboard] = await Promise.all([
         apiService.getHealth().catch(() => null),
         apiService.getDashboard(),
@@ -49,6 +50,15 @@ export const App: React.FC = () => {
     fetchInitialData();
   }, []);
 
+  const handleNavigate = (route: NavRoute, sessionId?: string) => {
+    if (sessionId) {
+      setActiveSessionId(sessionId);
+    } else if (route === 'new-consultation' && currentRoute !== 'new-consultation') {
+      setActiveSessionId(null);
+    }
+    setCurrentRoute(route);
+  };
+
   const renderContent = () => {
     switch (currentRoute) {
       case 'dashboard':
@@ -58,15 +68,22 @@ export const App: React.FC = () => {
             loading={loading}
             error={error}
             onRetry={fetchInitialData}
-            onNavigate={setCurrentRoute}
+            onNavigate={handleNavigate}
           />
         );
       case 'new-consultation':
-        return <NewConsultationView onNavigate={setCurrentRoute} />;
+        return (
+          <NewConsultationView
+            initialSessionId={activeSessionId}
+            onNavigate={handleNavigate}
+          />
+        );
       case 'history':
-        return <HistoryView onNavigate={setCurrentRoute} />;
+        return <HistoryView onNavigate={handleNavigate} />;
       case 'doctors':
-        return <DoctorsView onNavigate={setCurrentRoute} />;
+        return <DoctorsView onNavigate={handleNavigate} />;
+      case 'hospitals':
+        return <HospitalsView onNavigate={handleNavigate} />;
       case 'settings':
         return <SettingsView />;
       default:
@@ -76,7 +93,7 @@ export const App: React.FC = () => {
             loading={loading}
             error={error}
             onRetry={fetchInitialData}
-            onNavigate={setCurrentRoute}
+            onNavigate={handleNavigate}
           />
         );
     }
@@ -87,7 +104,7 @@ export const App: React.FC = () => {
       {/* Sidebar & Mobile Nav */}
       <Navbar
         currentRoute={currentRoute}
-        onNavigate={setCurrentRoute}
+        onNavigate={handleNavigate}
         isBackendHealthy={isBackendHealthy}
       />
 

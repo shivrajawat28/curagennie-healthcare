@@ -30,10 +30,20 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, userName }) => {
           title: 'Find Doctors & Specialists',
           subtitle: 'Verified clinicians across Indian cities for in-person or teleconsultation',
         };
+      case 'hospitals':
+        return {
+          title: 'Hospital Network & Emergency Facilities',
+          subtitle: 'Verified hospital centers, 24x7 trauma, and ICU facilities across India',
+        };
       case 'settings':
         return {
           title: 'Preferences & Safety Settings',
           subtitle: 'Language defaults, emergency contacts, and engine configurations',
+        };
+      default:
+        return {
+          title: 'CuraGennie Healthcare',
+          subtitle: 'Voice-guided clinical assessment and medical navigation',
         };
     }
   };

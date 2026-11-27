@@ -1,4 +1,4 @@
-export type NavRoute = 'dashboard' | 'new-consultation' | 'history' | 'doctors' | 'settings';
+export type NavRoute = 'dashboard' | 'new-consultation' | 'history' | 'doctors' | 'hospitals' | 'settings';
 
 export type LanguageCode = 'en' | 'hi' | 'hinglish';
 
@@ -156,4 +156,46 @@ export interface DoctorListResponse {
   doctors: Doctor[];
   cities: string[];
   specialties: string[];
+}
+
+export interface Hospital {
+  id: string;
+  name: string;
+  hospital_type: string;
+  city: string;
+  address: string;
+  emergency_24x7: boolean;
+  icu_available: boolean;
+  helpline: string;
+  ambulance_phone: string;
+  departments: string[];
+  accreditation: string;
+  rating: string;
+}
+
+export interface HospitalListResponse {
+  total: number;
+  hospitals: Hospital[];
+  cities: string[];
+  departments: string[];
+}
+
+export interface AppointmentEnquiryPayload {
+  doctor_id?: string;
+  hospital_id?: string;
+  patient_name: string;
+  contact_phone: string;
+  preferred_mode: 'teleconsult' | 'in-person';
+  consultation_session_id?: string;
+  notes?: string;
+}
+
+export interface AppointmentEnquiryResult {
+  enquiry_id: string;
+  status: string;
+  message: string;
+  provider_name: string;
+  preferred_mode: string;
+  is_demo: boolean;
+  notice: string;
 }

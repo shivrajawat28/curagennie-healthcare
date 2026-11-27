@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Doctor, NavRoute } from '../../types';
+import { Doctor, NavRoute, AppointmentEnquiryResult } from '../../types';
 import { apiService } from '../../services/api';
 import {
   UserCheck,
@@ -10,6 +10,8 @@ import {
   RefreshCw,
   Building,
   CheckCircle,
+  X,
+  AlertCircle,
 } from 'lucide-react';
 
 interface DoctorsViewProps {
@@ -27,6 +29,16 @@ export const DoctorsView: React.FC<DoctorsViewProps> = ({ onNavigate }) => {
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [teleconsultOnly, setTeleconsultOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Booking Enquiry Modal State
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [patientName, setPatientName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [preferredMode, setPreferredMode] = useState<'in-person' | 'teleconsult'>('teleconsult');
+  const [notes, setNotes] = useState('');
+  const [enquirySubmitting, setEnquirySubmitting] = useState(false);
+  const [enquiryError, setEnquiryError] = useState<string | null>(null);
+  const [enquiryResult, setEnquiryResult] = useState<AppointmentEnquiryResult | null>(null);
 
   const loadDoctors = async () => {
     setLoading(true);
@@ -59,6 +71,41 @@ export const DoctorsView: React.FC<DoctorsViewProps> = ({ onNavigate }) => {
       doc.hospital_or_clinic.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
+
+  const handleOpenBooking = (doc: Doctor) => {
+    setSelectedDoctor(doc);
+    setPreferredMode(doc.teleconsult_available ? 'teleconsult' : 'in-person');
+    setEnquiryResult(null);
+    setEnquiryError(null);
+    setPatientName('');
+    setContactPhone('');
+    setNotes('');
+  };
+
+  const handleSubmitEnquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDoctor || !patientName.trim() || !contactPhone.trim()) {
+      setEnquiryError('Please provide patient name and contact phone number.');
+      return;
+    }
+
+    setEnquirySubmitting(true);
+    setEnquiryError(null);
+    try {
+      const result = await apiService.submitAppointmentEnquiry({
+        doctor_id: selectedDoctor.id,
+        patient_name: patientName.trim(),
+        contact_phone: contactPhone.trim(),
+        preferred_mode: preferredMode,
+        notes: notes.trim() || undefined,
+      });
+      setEnquiryResult(result);
+    } catch (err: any) {
+      setEnquiryError(err.message || 'Failed to submit appointment enquiry.');
+    } finally {
+      setEnquirySubmitting(false);
+    }
+  };
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
@@ -219,11 +266,8 @@ export const DoctorsView: React.FC<DoctorsViewProps> = ({ onNavigate }) => {
                 </div>
 
                 <button
-                  onClick={() =>
-                    alert(
-                      `Demo Booking:\n\nConnecting to Dr. ${doc.name} (${doc.specialty}).\nIn Phase 04, direct appointment scheduling and clinical summary sharing will be enabled.`
-                    )
-                  }
+                  type="button"
+                  onClick={() => handleOpenBooking(doc)}
                   className="px-3.5 py-1.5 rounded-lg bg-forest-800 text-ivory-50 text-xs font-semibold hover:bg-forest-900 transition-colors shadow-soft"
                 >
                   Book Consult
@@ -231,6 +275,164 @@ export const DoctorsView: React.FC<DoctorsViewProps> = ({ onNavigate }) => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Appointment Booking Modal */}
+      {selectedDoctor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-charcoal-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl border border-ivory-300 max-w-md w-full p-6 shadow-card space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3 border-b border-ivory-200 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-forest-900">Book Doctor Consultation</h3>
+                <p className="text-xs text-sage-600 font-medium">
+                  {selectedDoctor.name} • {selectedDoctor.specialty}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedDoctor(null)}
+                className="p-1 rounded-lg text-charcoal-700 hover:bg-ivory-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {enquiryResult ? (
+              <div className="space-y-4 py-2">
+                <div className="p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-950 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                    <h4 className="text-sm font-bold">{enquiryResult.message}</h4>
+                  </div>
+                  <p className="text-xs leading-relaxed">
+                    Doctor / Clinic: <strong>{enquiryResult.provider_name}</strong>
+                  </p>
+                  <p className="text-xs leading-relaxed capitalize">
+                    Consultation Mode: <strong>{enquiryResult.preferred_mode}</strong>
+                  </p>
+                  <p className="text-[11px] text-emerald-800 font-mono">
+                    Enquiry Tracking ID: {enquiryResult.enquiry_id}
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-ivory-300 bg-ivory-50 text-[11px] text-charcoal-700 space-y-1">
+                  <p className="font-semibold text-forest-900">Notice:</p>
+                  <p>{enquiryResult.notice}</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedDoctor(null)}
+                  className="w-full py-2.5 rounded-xl bg-forest-800 text-ivory-50 text-xs font-semibold hover:bg-forest-900 transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitEnquiry} className="space-y-4 text-xs">
+                {enquiryError && (
+                  <div className="p-3 rounded-lg border border-red-200 bg-red-50 text-red-900 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                    <span>{enquiryError}</span>
+                  </div>
+                )}
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-forest-900 block">Patient Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={patientName}
+                    onChange={(e) => setPatientName(e.target.value)}
+                    placeholder="e.g. Meera Sharma"
+                    className="w-full px-3 py-2 rounded-lg border border-ivory-300 bg-ivory-50 focus:outline-none focus:ring-1 focus:ring-forest-800"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-forest-900 block">Contact Phone Number (India) *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    placeholder="e.g. +91 98765 43210"
+                    className="w-full px-3 py-2 rounded-lg border border-ivory-300 bg-ivory-50 focus:outline-none focus:ring-1 focus:ring-forest-800"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-forest-900 block">Preferred Mode</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      disabled={!selectedDoctor.teleconsult_available}
+                      onClick={() => setPreferredMode('teleconsult')}
+                      className={`py-2 px-3 rounded-lg font-medium border text-center transition-colors disabled:opacity-40 ${
+                        preferredMode === 'teleconsult'
+                          ? 'bg-forest-800 text-ivory-50 border-forest-800'
+                          : 'bg-ivory-50 border-ivory-300 text-charcoal-700'
+                      }`}
+                    >
+                      Teleconsult (Online)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreferredMode('in-person')}
+                      className={`py-2 px-3 rounded-lg font-medium border text-center transition-colors ${
+                        preferredMode === 'in-person'
+                          ? 'bg-forest-800 text-ivory-50 border-forest-800'
+                          : 'bg-ivory-50 border-ivory-300 text-charcoal-700'
+                      }`}
+                    >
+                      In-Person Clinic Visit
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-forest-900 block">Health Concern Notes</label>
+                  <textarea
+                    rows={2}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Briefly state your symptoms or reason for visit..."
+                    className="w-full px-3 py-2 rounded-lg border border-ivory-300 bg-ivory-50 focus:outline-none focus:ring-1 focus:ring-forest-800"
+                  />
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-ivory-100 border border-ivory-300 flex items-center justify-between">
+                  <span className="text-[11px] text-charcoal-700">Estimated Consultation Fee</span>
+                  <span className="text-xs font-bold text-forest-900">₹{selectedDoctor.fee_inr}</span>
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDoctor(null)}
+                    disabled={enquirySubmitting}
+                    className="px-4 py-2 rounded-lg border border-ivory-300 text-charcoal-700 hover:bg-ivory-100 font-semibold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={enquirySubmitting}
+                    className="px-4 py-2 rounded-lg bg-forest-800 text-ivory-50 font-semibold hover:bg-forest-900 transition-colors shadow-soft flex items-center gap-1.5"
+                  >
+                    {enquirySubmitting ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Confirming...</span>
+                      </>
+                    ) : (
+                      <span>Confirm Appointment Request</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
       )}
     </div>

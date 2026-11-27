@@ -5,9 +5,9 @@ import {
   Mic,
   Clock,
   UserCheck,
+  Building2,
   Settings,
   ShieldAlert,
-  Sparkles,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'new-consultation' as NavRoute, label: 'New Consultation', icon: Mic, highlight: true },
     { id: 'history' as NavRoute, label: 'Consultation History', icon: Clock },
     { id: 'doctors' as NavRoute, label: 'Find Doctors', icon: UserCheck },
+    { id: 'hospitals' as NavRoute, label: 'Hospital Network', icon: Building2 },
     { id: 'settings' as NavRoute, label: 'Settings', icon: Settings },
   ];
 
@@ -98,24 +99,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Engine Status
               </span>
               <span className="text-[11px] text-sage-600 font-semibold uppercase">
-                {isBackendHealthy ? 'Local Offline' : 'Connecting'}
+                {isBackendHealthy ? 'Online' : 'Connecting'}
               </span>
             </div>
-            <div className="flex items-center gap-1 text-[11px] text-charcoal-700/80">
-              <Sparkles className="w-3.5 h-3.5 text-sage-500 shrink-0" />
-              <span>Zero-key triage ready</span>
+            <div className="text-[11px] text-charcoal-700/70 space-y-1 pt-1 border-t border-ivory-200">
+              <div className="flex items-center justify-between">
+                <span>Architecture</span>
+                <span className="font-semibold text-forest-900">Zero-Key Offline</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Voice Engine</span>
+                <span className="font-semibold text-forest-900">Web Speech + RMS</span>
+              </div>
             </div>
           </div>
 
-          <div className="p-3 rounded-lg bg-red-50/70 border border-red-100 text-xs text-warmred-600 space-y-1">
-            <div className="flex items-center gap-1.5 font-semibold text-red-700">
-              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-              <span>Emergency Help</span>
-            </div>
-            <p className="text-[11px] text-red-700/80 leading-relaxed">
-              In acute life threat, dial <strong className="font-bold underline">112</strong> or{' '}
-              <strong className="font-bold underline">108</strong> immediately.
-            </p>
+          <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-[11px] flex items-center gap-2 text-red-900">
+            <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Emergency in India? Dial <strong>112</strong> immediately.</span>
           </div>
         </div>
       </aside>
@@ -146,7 +147,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`flex flex-col items-center gap-1 py-1 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
+              className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-lg text-[9px] font-medium transition-colors ${
                 isActive
                   ? 'text-forest-900 font-bold'
                   : 'text-charcoal-700 hover:text-forest-800'
@@ -163,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Icon className="w-4 h-4" />
               </div>
-              <span className="truncate max-w-[58px]">{item.label}</span>
+              <span className="truncate max-w-[52px]">{item.label}</span>
             </button>
           );
         })}

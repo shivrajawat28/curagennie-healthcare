@@ -5,16 +5,16 @@ import {
   Clock,
   Calendar,
   FileText,
-  RefreshCw,
   Search,
   CheckCircle,
   ChevronRight,
   X,
   Plus,
+  PlayCircle,
 } from 'lucide-react';
 
 interface HistoryViewProps {
-  onNavigate: (route: NavRoute) => void;
+  onNavigate: (route: NavRoute, sessionId?: string) => void;
 }
 
 export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
@@ -100,21 +100,14 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
               {level}
             </button>
           ))}
-          <button
-            onClick={loadConsultations}
-            title="Refresh"
-            className="p-1.5 text-charcoal-700 hover:text-forest-900 hover:bg-ivory-100 rounded-lg ml-auto md:ml-0"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
         </div>
       </div>
 
-      {/* Records List */}
+      {/* Consultations List */}
       {loading ? (
-        <div className="p-12 text-center text-charcoal-700 space-y-2">
-          <RefreshCw className="w-6 h-6 animate-spin mx-auto text-forest-800" />
-          <p className="text-xs font-medium">Loading consultation records...</p>
+        <div className="p-12 text-center text-charcoal-700">
+          <Clock className="w-6 h-6 animate-spin mx-auto mb-2 text-forest-800" />
+          <p className="text-xs font-medium">Retrieving saved clinical transcripts...</p>
         </div>
       ) : error ? (
         <div className="p-6 rounded-xl border border-red-200 bg-red-50 text-red-900 text-xs text-center space-y-2">
@@ -151,7 +144,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
                     <span className="text-sm font-bold text-forest-900">
                       {item.chief_complaint}
                     </span>
-                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-ivory-100 text-charcoal-700">
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-ivory-100 text-charcoal-700 capitalize">
                       {item.language}
                     </span>
                   </div>
@@ -168,7 +161,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
                       })}
                     </span>
                     <span>•</span>
-                    <span>{item.messages.length} interaction steps</span>
+                    <span>{item.messages.length} messages</span>
                   </p>
                 </div>
 
@@ -200,7 +193,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
             <div className="p-5 border-b border-ivory-200 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-forest-900">Clinical Consultation Record</h3>
-                <p className="text-xs text-charcoal-700/70">ID: {selectedSession.id}</p>
+                <p className="text-xs text-charcoal-700/70 font-mono">ID: {selectedSession.id}</p>
               </div>
               <button
                 onClick={() => setSelectedSession(null)}
@@ -248,7 +241,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
               {/* Dialogue Transcript */}
               <div className="space-y-3">
                 <h4 className="text-xs font-bold text-forest-900 uppercase tracking-wider">
-                  Consultation Transcript
+                  Consultation Transcript ({selectedSession.messages.length} messages)
                 </h4>
                 {selectedSession.messages.length > 0 ? (
                   <div className="space-y-2">
@@ -274,13 +267,24 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="p-4 border-t border-ivory-200 bg-ivory-50 flex items-center justify-between">
-              <span className="text-[11px] text-charcoal-700/70">
-                Non-diagnostic record for clinician review
-              </span>
+            <div className="p-4 border-t border-ivory-200 bg-ivory-50 flex items-center justify-between gap-2">
               <button
+                type="button"
+                onClick={() => {
+                  const id = selectedSession.id;
+                  setSelectedSession(null);
+                  onNavigate('new-consultation', id);
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-forest-800 text-ivory-50 text-xs font-semibold hover:bg-forest-900 transition-colors shadow-soft"
+              >
+                <PlayCircle className="w-3.5 h-3.5" />
+                <span>Resume in Consultation View</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setSelectedSession(null)}
-                className="px-4 py-2 rounded-lg bg-forest-800 text-ivory-50 text-xs font-semibold"
+                className="px-4 py-2 rounded-xl border border-ivory-300 bg-white text-charcoal-700 text-xs font-semibold hover:bg-ivory-100"
               >
                 Close
               </button>

@@ -5,6 +5,9 @@ import {
   DoctorListResponse,
   EngineResponse,
   AssessmentResponse,
+  HospitalListResponse,
+  AppointmentEnquiryPayload,
+  AppointmentEnquiryResult,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -71,4 +74,19 @@ export const apiService = {
     const queryString = query.toString() ? `?${query.toString()}` : '';
     return fetchJson<DoctorListResponse>(`/doctors${queryString}`);
   },
+
+  getHospitals: (params?: { city?: string; department?: string; emergency_only?: boolean }) => {
+    const query = new URLSearchParams();
+    if (params?.city) query.set('city', params.city);
+    if (params?.department) query.set('department', params.department);
+    if (params?.emergency_only) query.set('emergency_only', 'true');
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return fetchJson<HospitalListResponse>(`/hospitals${queryString}`);
+  },
+
+  submitAppointmentEnquiry: (payload: AppointmentEnquiryPayload) =>
+    fetchJson<AppointmentEnquiryResult>('/hospitals/enquire', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
 };

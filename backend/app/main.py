@@ -14,7 +14,7 @@ from app.core.exceptions import (
     validation_exception_handler,
     generic_exception_handler,
 )
-from app.routers import health, dashboard, consultations, doctors
+from app.routers import health, dashboard, consultations, doctors, hospitals
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("curagennie")
@@ -58,6 +58,7 @@ app.include_router(health.router, prefix=api_prefix)
 app.include_router(dashboard.router, prefix=api_prefix)
 app.include_router(consultations.router, prefix=api_prefix)
 app.include_router(doctors.router, prefix=api_prefix)
+app.include_router(hospitals.router, prefix=api_prefix)
 
 
 @app.get("/")
