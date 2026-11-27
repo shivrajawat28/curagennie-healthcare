@@ -1,0 +1,11 @@
+**/.git
+**/.gitignore
+**/node_modules
+**/dist
+**/.venv
+**/__pycache__
+**/*.pyc
+**/*.sqlite3
+**/*.db
+**/.DS_Store
+**/.env
