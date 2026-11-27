@@ -140,28 +140,70 @@ NEGATION_WORDS: List[str] = [
     # English
     "no", "not", "without", "never", "dont", "don't", "denies", "denied",
     "havent", "haven't", "negative", "free of", "neither", "nor", "rule out",
+    "does not have", "doesn't have", "didn't have", "did not have",
     # Hinglish
     "nahi", "nahin", "nhi", "na", "mat", "bina", "koi nahi", "bilkul nahi",
+    "nahi hai", "nhi hai", "nahin hai",
     # Hindi Devanagari
-    "नहीं", "ना", "बिना", "कोई नहीं", "बिल्कुल नहीं",
+    "नहीं", "ना", "बिना", "कोई नहीं", "बिल्कुल नहीं", "नहीं है", "नही है",
 ]
 
 # Temporal indicators signifying past/resolved conditions rather than active emergencies
 PAST_TEMPORAL_MARKERS: List[str] = [
     # English
     "last month", "last year", "years ago", "in the past", "history of", "previously",
-    "few weeks ago", "months ago", "had previously", "resolved", "recovered from",
-    "was having", "used to have", "long ago",
+    "few weeks ago", "months ago", "had previously", "recovered from",
+    "was having", "used to have", "long ago", "earlier today", "few days ago",
     # Hinglish
-    "pichle mahine", "pichle saal", "pehle tha", "pehle hua tha", "theek ho gaya",
-    "purana tha", "bahut pehle", "kuch mahine pehle", "purani baat hai",
+    "pichle mahine", "pichle saal", "pehle tha", "pehle hua tha",
+    "purana tha", "bahut pehle", "kuch mahine pehle", "purani baat hai", "pehle aya tha",
     # Hindi Devanagari
     "पिछले महीने", "पिछले साल", "पहले था", "पुराना", "पहले हुआ था",
+]
+
+# Explicit markers indicating a symptom has completely resolved/subsided
+RESOLVED_MARKERS: List[str] = [
+    # English
+    "resolved", "completely resolved", "fully recovered", "pain is gone",
+    "stopped now", "no longer having", "has subsided", "not hurting anymore", "completely fine now",
+    # Hinglish
+    "theek ho gaya", "theek ho gayi", "dard chala gaya", "ab dard nahi hai",
+    "ruk gaya", "band ho gaya", "ab theek hai", "khatam ho gaya",
+    # Hindi Devanagari
+    "ठीक हो गया", "ठीक हो गई", "दर्द चला गया", "अब दर्द नहीं है", "बंद हो गया", "अब ठीक है",
+]
+
+# Explicit markers indicating an acute symptom is active, persistent, or currently continuing
+ONGOING_MARKERS: List[str] = [
+    # English
+    "still having", "still hurting", "ongoing", "still continuing", "continues right now",
+    "getting worse right now", "still present", "active right now",
+    # Hinglish
+    "abhi bhi hai", "abhi bhi dard hai", "lagatar ho raha hai", "chal raha hai",
+    "badhta ja raha hai", "dard bana hua hai",
+    # Hindi Devanagari
+    "अभी भी है", "अभी भी दर्द है", "लगातार हो रहा है", "बना हुआ है",
+]
+
+# Third-party / Other person indicators
+OTHER_PERSON_MARKERS: List[str] = [
+    # English
+    "father", "mother", "dad", "mom", "brother", "sister", "grandfather", "grandmother",
+    "grandpa", "grandma", "son", "daughter", "child", "baby", "husband", "wife",
+    "friend", "neighbor", "neighbour", "colleague", "coworker", "relative",
+    "someone else", "another person", "uncle", "aunt", "patient",
+    # Hinglish
+    "pitaji", "mataji", "bhai", "behen", "dada", "dadi", "nana", "nani",
+    "chacha", "chachi", "beta", "beti", "bachha", "pati", "patni", "dost", "padosi",
+    # Hindi Devanagari
+    "पिताजी", "माताजी", "भाई", "बहन", "दादा", "दादी", "नाना", "नानी",
+    "चाचा", "चाची", "बेटा", "बेटी", "बच्चा", "पति", "पत्नी", "दोस्त", "पड़ोसी",
 ]
 
 # Ambiguity markers: When red flag keywords appear alongside hesitation, prompt for clarification
 AMBIGUITY_MARKERS: List[str] = [
     "maybe", "might be", "not sure if", "pata nahi", "shayad", "doubtful",
     "kuch keh nahi sakte", "lagta hai ya nahi", "confusion hai", "perhaps",
+    "possibly", "could be",
     "शायद", "पता नहीं",
 ]

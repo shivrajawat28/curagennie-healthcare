@@ -1,6 +1,6 @@
 """Pydantic schemas for structured clinical assessment results."""
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 
@@ -14,7 +14,12 @@ class AssessmentResponse(BaseModel):
     main_concern: str
     reported_symptoms: List[str]
     duration_timeline: Optional[str] = None
-    follow_up_summary: dict = Field(default_factory=dict)
+    follow_up_summary: Dict[str, str] = Field(default_factory=dict)
+    user_reported_facts: Dict[str, Any] = Field(default_factory=dict)
+    clinical_interpretations_summary: str = Field(
+        default="Your symptoms may be consistent with common outpatient patterns. Other explanations are possible. This is not a confirmed medical diagnosis.",
+        description="Standard cautious interpretation summary"
+    )
     missing_or_uncertain_info: List[str] = Field(default_factory=list)
     potential_explanations: List[ClinicalExplanation] = Field(default_factory=list)
     warning_signs_screened: List[str] = Field(default_factory=list)
