@@ -111,70 +111,8 @@ docker compose up --build
 
 ---
 
-## 🧪 Automated Testing & QA
 
-### Backend Test Suite (46 Tests)
-Includes complete coverage of API routers, multilingual normalization, safety negation, temporal past filtering, clinical pathways, and doctor/hospital enquiries:
-```bash
-cd backend
-source .venv/bin/activate
-PYTHONPATH=. pytest tests/ -v
-```
-*Current test suite result: **46 / 46 passed (100%)**.*
 
-### Frontend Production Build & TypeScript Verification
-```bash
-cd frontend
-npm run build
-```
-*Current build status: **0 TypeScript errors, production bundle generated cleanly**.*
-
----
-
-## 🎬 Demonstration Workflows
-
-You can evaluate CuraGennie using the following representative clinical workflows:
-
-### Workflow 1: Hinglish Fever & Body Ache (Outpatient Pathway)
-1. Navigate to **New Consultation**.
-2. Select **Hinglish** (or click the quick prompt: *"Mujhe 2 din se tez bukhar hai aur badan me dard hai"*).
-3. Tap the **Microphone** button and speak naturally or submit the text.
-4. CuraGennie detects fever and body pain, automatically activates the **Fever Pathway**, and asks the first clinical follow-up regarding maximum temperature.
-5. Answer follow-up questions (or test pre-answering by stating: *"Temperature 102 hai aur koi rash nahi hai"*).
-6. Notice that questions about rash are automatically skipped because you already answered them.
-7. Upon completing follow-ups (max 4 questions), CuraGennie renders a structured **Clinical Triage Summary** with timeline, non-diagnostic potential explanations, home care hydration advice, and links to recommended specialists.
-
-### Workflow 2: Acute Chest Pain (Emergency Escalation)
-1. In **New Consultation**, state: *"Severe crushing chest pain radiating to my left arm and heavy sweating"*.
-2. CuraGennie immediately detects cardiac emergency red flags:
-   - Halts all routine intake questions.
-   - Flashes the **Critical Emergency Escalation** banner.
-   - Provides direct one-click dial buttons for **112** (National Emergency) and **108** (Ambulance).
-   - Generates an immediate emergency assessment advising urgent in-person ER evaluation.
-
-### Workflow 3: Hospital & Emergency Network Discovery
-1. Click **Hospital Network** in the sidebar.
-2. Filter by city (e.g. *Bengaluru*), select **24x7 Emergency Only**, or filter by department (*Cardiology*, *Pediatrics*).
-3. Click **Enquire / Book** on any facility to open the interactive appointment booking modal.
-4. Submit patient contact details to receive an instant enquiry tracking ID.
-
----
-
-## 📋 Hackathon Roadmap & Project Status
-
-| Phase | Milestone | Status |
-| :--- | :--- | :--- |
-| **Phase 00** | Workspace Audit, Feasibility & Technical Planning | ✅ Complete |
-| **Phase 01** | Scaffolding, Custom Design System & Responsive Shell | ✅ Complete |
-| **Phase 02** | Multilingual Normalization & Clinical State Machine | ✅ Complete |
-| **Phase 02.5**| Safety Negation, Temporal Context & Pathway Hardening | ✅ Complete |
-| **Phase 03** | Web Speech STT/TTS & Web Audio RMS Dynamic Waveform | ✅ Complete |
-| **Phase 04** | Structured Assessments, Fact vs Interpretation Separation | ✅ Complete |
-| **Phase 05** | Doctor Directory & Hospital Network Discovery + Booking | ✅ Complete |
-| **Phase 06** | History Persistence, Transcript Resumption & Full UX | ✅ Complete |
-| **Phase 07** | Dockerization, Comprehensive Tests & Documentation | ✅ Complete |
-
----
 
 ## ⚖️ Clinical Safety & Legal Disclaimer
 
